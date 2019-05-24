@@ -1,10 +1,11 @@
 {
-  "name": "react-sirv",
+  "name": "serve-react",
   "version": "0.0.1",
   "description": "",
   "main": "dist/index.js",
   "scripts": {
-    "start": "rm -rf ./built && ts-node src/index.ts public -p 8001 -t ./public/index.html -w webpack.config.js"
+    "start": "ts-node src/index.ts public -p 8001",
+    "error": "ts-node src/index.ts -p 8001"
   },
   "keywords": [],
   "author": "",
@@ -19,8 +20,10 @@
     "@types/node": "^12.0.2",
     "@types/webpack": "^4.4.32",
     "babel-loader": "^8.0.6",
+    "chalk-animation": "^1.6.0",
     "commander": "^2.20.0",
     "express": "^4.17.0",
+    "gradient-string": "^1.2.0",
     "memory-fs": "^0.4.1",
     "react": "^16.8.6",
     "react-dom": "^16.8.6",

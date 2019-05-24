@@ -1,4 +1,4 @@
-# reactz
+# serve-react
 
-> A simple SSR dev server for React Components.
+> A simple dev server for React.
 

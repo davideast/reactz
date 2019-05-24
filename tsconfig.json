@@ -1,0 +1,14 @@
+{
+  "compilerOptions": {
+    "target": "esnext",
+    "module": "commonjs",
+    "removeComments": true,
+    "moduleResolution": "node",
+    "jsx": "react",
+    "baseUrl": "./src",
+    "outDir": "./dist",
+    "lib": ["es5", "es6", "dom"],
+    "resolveJsonModule": true,
+    "esModuleInterop": true
+  }
+}

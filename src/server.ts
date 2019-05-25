@@ -1,11 +1,10 @@
 import express from 'express';
-import program from 'commander';
 import { memFS } from './index';
 import { log } from './log';
 
-export function startServer(publicDir) {
+export function startServer({ publicDir, port }) {
   const app = createServer(publicDir);
-  app.listen(parseInt(program.port, 10), () => console.log(`Listening on ${program.port}...`));
+  app.listen(parseInt(port, 10), () => console.log(`Listening on ${port}...`));
   return app;
 }
 

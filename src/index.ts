@@ -3,7 +3,7 @@ import program from 'commander';
 import webpack from 'webpack';
 import MemoryFS from 'memory-fs';
 import { startServer } from './server';
-import { webpackConfig, webpackCompile } from './webpack-compiler';
+import { webpackConfig, webpackCompile, webpackConfigTypeScript } from './webpack-compiler';
 import { gradientLog, log } from './log';
 
 export const memFS = new MemoryFS();
@@ -14,23 +14,64 @@ program
   .version('0.0.2')
   .arguments('<dir>')
   .option('-p, --port [number]', 'Specify port')
-  .option('-t, --template [file]', 'Provide html template')
+  .option('-e, --entry [entry]', 'Entry point for webpack')
+  .option('-t, --typescript', 'Compile for TypeScript')
   .option('-w, --webpack [file]', 'Provide a webpack config')
   .action(async dir => {
+    
+    if(dir == undefined) {
+      const message = `No serving directory specified! Try something like serve-react public -p 8081`;
+      log(message);
+      throw new Error(message);
+    }
+
+    const port = program.port || 8001;
+    const ts = !!program.typescript;
+    
+    let entry = 'index.js';
+
+    if(!program.entry) {
+      if(ts) {
+        entry = 'index.tsx';
+      } else {
+        entry = 'index.js';
+      }
+    } else {
+      entry = program.entry;
+    }
+    
+    // TODO(davideast): Handle custom configs or a default config OR! a TypeScript config
+    
+    if(ts) {
+      log('> Using a TypeScript webpack config');
+    }
+
     log('> Looking for a webpack entry point...');
-    const config = webpackConfig({ dir, file: 'index.js' });
-    log(`> > Found ${process.cwd()}/${dir}/index.js !`);
-    log(`> > Staring webpack!`);
+
+    const config = ts ? 
+      webpackConfigTypeScript({ filePath: entry }) : 
+      webpackConfig({ dir, file: entry });
+
+    log(`> > Found ${process.cwd()}/${dir}/${entry} !\n`);
+    log(`> > Staring webpack!\n`);
+    
     const compiler = webpack(config);
     compiler.outputFileSystem = memFS;
-    await webpackCompile(compiler);
+    const stats = await webpackCompile(compiler);
+    log(`${stats.toString()}\n`);
+
+    if(stats.compilation.errors.length > 0) {
+      return;
+    }
+
     log(`> > Build successful! \n`);
     log(`> Starting server! \n`);
+
     gradientLog(`------------------------------------------------------------------\n`);
     log(`The webpack bundle (/bundle.js) is served from an in memory filesystem. \n`);
     log(`Static files are served from ${process.cwd()}/${dir}\n`);
     gradientLog('------------------------------------------------------------------\n');
-    startServer(dir);
+    startServer({ publicDir: dir, port });
   })
   .parse(process.argv);
 

@@ -43,11 +43,11 @@ export function webpackConfig({ dir, file }) {
   } as any;
 }
 
-export function webpackConfigTypeScript({ filePath }) {
+export function webpackConfigTypeScript({ dir, file }) {
   return {
     mode: 'development',
     devtool: 'inline-source-map',
-    entry: path.resolve(process.cwd(), `${filePath}`),
+    entry: path.resolve(process.cwd(), `${dir}/${file}`),
     output: {
       filename: 'bundle.js',
       path: '/built'

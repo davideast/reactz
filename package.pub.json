@@ -1,20 +1,18 @@
 {
   "name": "serve-react",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "description": "",
-  "main": "dist/index.js",
-  "scripts": {
-    "start": "ts-node src/index.ts public -p 8001",
-    "build": "tsc",
-    "ts": "ts-node src/index.ts public -p 8001 --typescript -e public/index.tsx",
-    "error": "ts-node src/index.ts -p 8001"
-  },
+  "main": "index.js",
   "bin": {
-    "serve-react": "dist/index.js"
+    "serve-react": "index.js"
   },
   "keywords": [],
-  "author": "",
+  "author": "David East <david@firebase.com>",
   "license": "MIT",
+  "peerDependencies": {
+    "react": "^16.0.0",
+    "react-dom": "^16.0.0"
+  },
   "dependencies": {
     "@babel/core": "^7.4.5",
     "@babel/preset-env": "^7.4.5",
@@ -29,8 +27,6 @@
     "express": "^4.17.0",
     "gradient-string": "^1.2.0",
     "memory-fs": "^0.4.1",
-    "react": "^16.8.6",
-    "react-dom": "^16.8.6",
     "ts-loader": "^6.0.1",
     "ts-node": "^8.1.0",
     "typescript": "^3.4.5",

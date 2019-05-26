@@ -12,3 +12,7 @@ export function gradientLog(message: string, from = '#C86DD7', to = '#3023AE') {
 export function errorLog(message: string) {
   return gradientLog(message, '#BB6262', '#B02B2B');
 }
+
+export function successLog(message: string) {
+  return gradientLog(message, '#6dd793', '#23ae67');
+}

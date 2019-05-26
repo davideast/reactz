@@ -4,9 +4,9 @@
   "description": "",
   "main": "dist/index.js",
   "scripts": {
-    "start": "ts-node src/index.ts public -p 8001",
+    "start": "ts-node src/index.ts demo/public -p 8001 -e demo/src/index.js",
     "build": "tsc",
-    "ts": "ts-node src/index.ts public -p 8001 --typescript -e public/index.tsx",
+    "ts": "ts-node src/index.ts demo-ts/public -e demo-ts/src/index.tsx --typescript",
     "error": "ts-node src/index.ts -p 8001"
   },
   "bin": {

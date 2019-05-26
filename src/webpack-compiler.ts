@@ -1,5 +1,4 @@
 import webpack from 'webpack';
-import path from 'path';
 
 export async function webpackCompile(compiler: webpack.Compiler): Promise<webpack.Stats> {
   return new Promise((resolve, reject) => {
@@ -13,7 +12,7 @@ export async function webpackCompile(compiler: webpack.Compiler): Promise<webpac
   });
 }
 
-export function webpackConfig({ dir, file }) {
+export function webpackConfig({ dir, absoluteEntryPath }) {
   return {
     mode: 'development',
     devtool: 'inline-source-map',
@@ -21,7 +20,7 @@ export function webpackConfig({ dir, file }) {
       extensions: ['.js', '.jsx' ]
     },
     target: 'web',
-    entry: path.resolve(process.cwd(), `${dir}/${file}`),
+    entry: absoluteEntryPath,
     output: {
       filename: 'bundle.js',
       path: '/built'
@@ -43,11 +42,11 @@ export function webpackConfig({ dir, file }) {
   } as any;
 }
 
-export function webpackConfigTypeScript({ dir, file }) {
+export function webpackConfigTypeScript({ dir, absoluteEntryPath }) {
   return {
     mode: 'development',
     devtool: 'inline-source-map',
-    entry: path.resolve(process.cwd(), `${dir}/${file}`),
+    entry: absoluteEntryPath,
     output: {
       filename: 'bundle.js',
       path: '/built'
@@ -57,7 +56,10 @@ export function webpackConfigTypeScript({ dir, file }) {
     },
     module: {
       rules: [
-        { test: /\.tsx?$/, loader: 'ts-loader' }
+        { 
+          test: /\.tsx?$/, 
+          loader: 'ts-loader',
+        }
       ]
     }
   };

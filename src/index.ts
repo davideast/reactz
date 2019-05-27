@@ -5,14 +5,16 @@ import MemoryFS from 'memory-fs';
 import path from 'path';
 import { startServer } from './server';
 import { gradientLog, log, errorLog, successLog } from './log';
-import { 
-  webpackConfig, webpackCompile, webpackConfigTypeScript 
-} 
-from './webpack-compiler';
+import {
+  webpackConfig, webpackCompile, webpackConfigTypeScript
+}
+  from './webpack-compiler';
 
 export const memFS = new MemoryFS();
 
-gradientLog('⚡️ Starting react-serve!\n');
+log('⚡️ ⚡️ ⚡️ ⚡️ ⚡️ ⚡️ ⚡️ ⚡️ ⚡️ ⚡️ ⚡️ ⚡️ ⚡️ ⚡️ ⚡️ ⚡️ ⚡️ ⚡️ ⚡️ ⚡️ ⚡️ ⚡️ ⚡️ ⚡️ ⚡️ ⚡️\n');
+gradientLog('⚡️             Starting react-serve!               ⚡️\n')
+log('⚡️ ⚡️ ⚡️ ⚡️ ⚡️ ⚡️ ⚡️ ⚡️ ⚡️ ⚡️ ⚡️ ⚡️ ⚡️ ⚡️ ⚡️ ⚡️ ⚡️ ⚡️ ⚡️ ⚡️ ⚡️ ⚡️ ⚡️ ⚡️ ⚡️ ⚡️\n');
 
 let global_ServingDir;
 
@@ -21,7 +23,7 @@ program
   .arguments('<servingDir>')
   .option('-p, --port [number]', 'Specify port')
   .option('-e, --entry [entry]', 'Entry point for webpack')
-  .option('-t, --typescript', 'Comspile for TypeScript')
+  .option('-t, --typescript', 'Compile for TypeScript')
   .action(async servingDir => {
     /**
      * This action callback is not triggered unless the user provides their 
@@ -38,27 +40,33 @@ program
     const port = program.port || 8001;
     const ts = !!program.typescript;
     const absoluteEntryPath = getAbsoluteEntryPath({ servingDir, program });
-    
-    if(ts) {
+
+    if (ts) {
       log('> Using a TypeScript webpack config');
     }
 
     log('> Looking for a webpack entry point...');
 
-    const config = ts ? 
-      webpackConfigTypeScript({ dir: servingDir, absoluteEntryPath }) : 
+    const config = ts ?
+      webpackConfigTypeScript({ dir: servingDir, absoluteEntryPath }) :
       webpackConfig({ dir: servingDir, absoluteEntryPath });
 
     successLog(`> > Using ${absoluteEntryPath}\n`);
     log(`> > Staring webpack!\n`);
-    
+
     const compiler = webpack(config);
     compiler.outputFileSystem = memFS;
     const stats = await webpackCompile(compiler);
-
     log(`${stats.toString()}\n`);
 
-    if(webpackBuildHasErrors(stats)) { return; }
+    if (webpackBuildHasErrors(stats)) {
+
+      // Some errors are critical but are not formatted in red, which can be difficult
+      // for a user to see. Below we find critical errors like EntryModuleNotFoundError and format them in red, then return.
+      logCriticalErrors(stats);
+
+      return;
+    }
 
     successLog(`> > Build successful! \n`);
     log(`> Starting server! \n`);
@@ -67,15 +75,20 @@ program
 
     log(`The webpack bundle (/bundle.js) is served from an in memory filesystem. \n`);
     log(`Static files are served from ${process.cwd()}/${servingDir}\n`);
-    
+
     gradientLog('------------------------------------------------------------------\n');
 
-    startServer({ publicDir: servingDir, port });
+    startServer({ servingDir, port });
   })
   .parse(process.argv);
 
-  if(global_ServingDir == undefined) {
-    const message = `No serving directory specified!
+if (noServingDirProvided()) {
+  logNoServingDirError();
+  process.exit(0);
+}
+
+function logNoServingDirError() {
+  const message = `No serving directory specified!
 
 serve-react needs know two things:
 
@@ -85,13 +98,33 @@ serve-react needs know two things:
 2) Entry file for webpack. serve-react will look for an index.{js,tsx} file in the serving directory if no file is provided.
     ex: serve-react static -e src/index.js
 `;
-    errorLog(message);
-    process.exit(0);
-  }
+  errorLog(message);
+}
 
-function getAbsoluteEntryPath({ program, servingDir }: { program: any, servingDir: string }) {
-  return typeof program.entry === 'string' ? 
-    path.join(process.cwd(), program.entry) : 
+function noServingDirProvided() {
+  return global_ServingDir == undefined;
+}
+
+function logCriticalErrors(stats: webpack.Stats) {
+  const { errors } = stats.compilation;
+  // errors.map(e => console.log(Object.keys(e)));
+  const noModuleFoundError = filterToFirst(errors, error => error.name === 'EntryModuleNotFoundError');
+  if (noEntryModuleFound(noModuleFoundError)) {
+    errorLog(`${noModuleFoundError.error}\n\n`);
+    errorLog(`☝️ ☝️ ☝️ This means serve-react couldn't find your entry point for webpack to compile. You tell us where the entry point is with an -e flag. If you don't provide one, we try to look for an index.{js,tsx} in your serving directory. Try something like this:\n`);
+    log('serve-react static -e src/index.js\n');
+  }
+}
+
+function noEntryModuleFound(noModuleFoundError: any) {
+  return noModuleFoundError != undefined;
+}
+
+function getAbsoluteEntryPath(
+  { program, servingDir }: { program: any, servingDir: string }
+) {
+  return typeof program.entry === 'string' ?
+    path.join(process.cwd(), program.entry) :
     path.join(process.cwd(), servingDir, `index.${determineExtension(program)}`);
 }
 
@@ -102,4 +135,8 @@ function determineExtension(program: any) {
 function webpackBuildHasErrors(stats: webpack.Stats) {
   // For some reason stats.hasErrors() can return true when there are no errors?
   return stats.compilation.errors.length > 0
+}
+
+function filterToFirst(list: any[], filterCallback: (error: any) => boolean) {
+  return list.filter(filterCallback)[0];
 }

@@ -16,8 +16,8 @@ react-serve checklist
 --------------------------------------------------------
 - [ ] Better start up messaging for devs to understand how the server is resolving files
 - [ ] Allow for a custom built directory for in memory build
-- [ ] Error message for no serving directory
-- [ ] Warning message about needing a tsconfig.json
+- [x] Error message for no serving directory
+- [x] Warning message about needing a tsconfig.json
 - [ ] Use the local webpack.config.js if exists
 - [ ] Allow for a custom webpack config name
 - [ ] Allow for a custom tsconfig.json name

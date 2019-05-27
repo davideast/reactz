@@ -1,8 +1,11 @@
 #!/usr/bin/env node
+// Note! These default exports are because of the esModuleInterop option, which memory-fs
+// requires. This turns "* as module" imports to default imports, or something like that.
 import program from 'commander';
 import webpack from 'webpack';
 import MemoryFS from 'memory-fs';
 import path from 'path';
+import fs from 'fs';
 import { startServer } from './server';
 import { gradientLog, log, errorLog, successLog } from './log';
 import {
@@ -19,7 +22,7 @@ log('⚡️ ⚡️ ⚡️ ⚡️ ⚡️ ⚡️ ⚡️ ⚡️ ⚡️ ⚡️ ⚡�
 let global_ServingDir;
 
 program
-  .version('0.0.2')
+  .version('0.0.3')
   .arguments('<servingDir>')
   .option('-p, --port [number]', 'Specify port')
   .option('-e, --entry [entry]', 'Entry point for webpack')
@@ -43,6 +46,14 @@ program
 
     if (ts) {
       log('> Using a TypeScript webpack config');
+
+      // Check for a tsconfig.json file. If one doesn't exist it will result in an error
+      // when compiling. Warn the user of this and give them an example config to copy
+      // and paste.
+      const tsconfigExists = hasTsconfig();
+      if(!tsconfigExists) {
+        logTsconfigError();
+      }
     }
 
     log('> Looking for a webpack entry point...');
@@ -73,7 +84,7 @@ program
 
     gradientLog(`------------------------------------------------------------------\n`);
 
-    log(`The webpack bundle (/bundle.js) is served from an in memory filesystem. \n`);
+    log(`The webpack bundle (/bundle.js) is served from an in memory file system.\n`);
     log(`Static files are served from ${process.cwd()}/${servingDir}\n`);
 
     gradientLog('------------------------------------------------------------------\n');
@@ -85,6 +96,26 @@ program
 if (noServingDirProvided()) {
   logNoServingDirError();
   process.exit(0);
+}
+
+function logTsconfigError() {
+  errorLog(`No tsconfig.json exists at the root of your current working directory (cwd). While serve-react tries to be as "zero-config" as possible, we require a tsconfig.json at the moment. 
+  
+  🔧 ---- HOW TO FIX ---- 🔧
+  Create a tsconfig.json at the root of your cwd and copy and paste the example config below to get started. Note you may need to tweak this config to fit your requirements.\n`);
+  log(`tsconfig.json
+---------------------------------------------
+{
+  "compilerOptions": {
+    "module": "esnext",
+    "moduleResolution": "node",
+    "jsx": "react",
+  }
+}\n`);
+}
+
+function hasTsconfig() {
+  return fs.existsSync(path.join(process.cwd(), 'tsconfig.json'));
 }
 
 function logNoServingDirError() {

@@ -1,7 +1,11 @@
 {
   "name": "serve-react",
-  "version": "0.0.2",
-  "description": "",
+  "version": "0.0.3",
+  "description": "A simple React dev server.",
+  "repository": {
+    "url": "https://github.com/davideast/serve-react"
+  },
+  "readme": "./README.md",
   "main": "index.js",
   "bin": {
     "serve-react": "index.js"

@@ -1,11 +1,11 @@
 {
   "name": "serve-react",
-  "version": "0.0.1",
+  "version": "0.0.3",
   "description": "",
   "main": "dist/index.js",
   "scripts": {
     "start": "ts-node src/index.ts demo/public -p 8001 -e demo/src/index.js",
-    "build": "tsc",
+    "build": "tsc && cp package.pub.json dist/src/package.json && cp README.md dist/src/README.md",
     "ts": "ts-node src/index.ts demo-ts/public -e demo-ts/src/index.tsx --typescript",
     "error": "ts-node src/index.ts demo/public -p 8001"
   },

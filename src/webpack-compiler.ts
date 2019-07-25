@@ -1,5 +1,32 @@
 import webpack from 'webpack';
 
+export function createCompiler({ 
+  usingTypeScript, 
+  servingDir,
+  absoluteEntryPath,
+  memFS,
+}) {
+  const config = getConfig({ 
+    usingTypeScript, 
+    servingDir,
+    absoluteEntryPath,
+  })
+
+  const compiler = webpack(config);
+
+  if(memFS) {
+    compiler.outputFileSystem = memFS;
+  }
+
+  return compiler;
+}
+
+export function getConfig({ usingTypeScript, servingDir, absoluteEntryPath }) {
+  return usingTypeScript ?
+    webpackConfigTypeScript({ dir: servingDir, absoluteEntryPath }) :
+    webpackConfig({ dir: servingDir, absoluteEntryPath });
+}
+
 export async function webpackCompile(compiler: webpack.Compiler): Promise<webpack.Stats> {
   return new Promise((resolve, reject) => {
     compiler.run((err, stats) => {
